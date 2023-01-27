@@ -1,0 +1,136 @@
+network:
+  # the model stuff
+  model: 'UNet_panoptic'
+  submodel: 'UNet_nocnt'
+  pretrained: False
+  pretrained_path:
+  non_linearity: 'mish'
+  backbone_filters: [64, 128, 256, 512] # The filter bank for the backbone
+  bottleneck_filters: 1024 # The number of channels for the bottleneck layer
+  head_dictionary:
+    # tag_regression:
+    reg:
+      type: 'regression'
+      filters: [512, 256, 128, 64]
+      output_channels: 2
+      loss_weight: 0.01
+      loss_name: 'l1_valid_regression'
+    # semantic_segmentation:
+    sem:
+      type: 'segmentation'
+      filters: [512, 256, 128, 64]
+      output_channels: 2
+      loss_name: 'class_weighted_xentropy'
+      class_num: 2
+      class_weights: [1.4222778260019158, 17.756478441971307]
+      class_ids: [0,1]
+      class_labels: [bg, plant]
+      loss_weight: 1.0
+      pbar_metrics: ['val_epoch_iou_plant']
+
+  dropout: 0.1
+  input_size: 4
+ 
+  
+trainer:
+  val_every_n_epochs: 10
+  max_epochs: 500
+  
+  precision: 32
+  # model checkpoints
+  checkpoints:
+    enable: True
+    path: './results/CN20_basic/'
+    every_n_val_epochs: 500
+    best_metric: 'val_epoch_iou_plant'
+    best_metric_mode: 'max'
+
+
+logger:
+  log_path: './results/CN20/'
+  log_lr: True
+  log_cfg_file: True
+
+  tb_enable: True
+  tb_log_path: './results/CN20/'
+
+  csv_enable: True
+  csv_log_path: './results/CN20/'
+
+
+optimizer:
+  verbose: True
+  final_layer: 'out'
+  type: "Adam"
+  lr_scheduler: "StepLR"
+  base_lr: 0.001
+  step_size: 2000  # this is essentially a fix learning rate
+  gamma: 0.5
+
+
+dataset:
+  location: ./
+  coconame: CKA_corn_2020_subset
+  subsets:
+  - train
+  - eval
+  extension: png
+  class_type: plant
+  class_num: 2
+  class_labels:
+  - bg
+  - plant
+  class_weights:
+  - 1.4222778260019158
+  - 17.756478441971307
+  things_ids: [1]
+  stuff_ids: [0]
+  transforms:
+    use: true
+    meanstdnorm:
+      use: true
+      RGB_mean_arr:
+      - 0.4686314767700548
+      - 0.48027667083381254
+      - 0.4787112560405845
+      RGB_std_arr:
+      - 0.16193299209546805
+      - 0.16058856069359198
+      - 0.15518094128139012
+    rescale:
+      use: true
+      output_size:
+      - 416
+      - 704
+      ispanoptic: true
+    panoptic:
+      use: true
+      radius: 1
+      semantic: true
+      blur: [9,9]
+      noiserange: 10  # check if return_keypoints is True !!!!
+    cntasinput:
+      use: true
+    totensor:
+      use: true
+  return_keypoints: True
+dataloader:
+  name: coco_farming
+  label_color:
+  - - 0
+    - 0
+    - 0
+  - - 0
+    - 255
+    - 0
+  batch_size: 1
+  shuffle: true
+  workers_num: 4
+  drop_last: true
+post_processing:
+  threshold: 0.4
+  nms_kernel: 7
+  top_k: 100
+  label_divisor: 1
+  stuff_area: 20
+  void_label: null
