@@ -51,7 +51,7 @@ These commands run evaluation for:
 
 ```
 ./run.sh EVAL BASIC SB20
-./run.sh EVAL BASIC SB20
+./run.sh EVAL BASIC CN20
 ./run.sh EVAL MISSING_CLICKS SB20 000
 ./run.sh EVAL MISSING_CLICKS SB20 025
 ./run.sh EVAL MISSING_CLICKS SB20 050
@@ -73,7 +73,7 @@ These commands run training for:
 
 ```
 ./run.sh TRAIN BASIC SB20
-./run.sh TRAIN BASIC SB20
+./run.sh TRAIN BASIC CN20
 ./run.sh TRAIN MISSING_CLICKS SB20 000
 ./run.sh TRAIN MISSING_CLICKS SB20 025
 ./run.sh TRAIN MISSING_CLICKS SB20 050
