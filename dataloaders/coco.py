@@ -190,7 +190,10 @@ class Parser( pl.LightningDataModule ):
         # Panoptic
         if k == 'panoptic' and v['use']:
           train_ts.append( Mytrans.Panoptic( radius=config['dataset']['transforms']['panoptic']['radius'],
-                                             blur=config['dataset']['transforms']['panoptic']['blur'] ) )
+                                             blur=config['dataset']['transforms']['panoptic']['blur'],
+                                             noiserange=config['dataset']['transforms']['panoptic']['noiserange'],
+                                             missing_click_perc=config['dataset']['transforms']['panoptic']['missing_click_perc'] if 'missing_click_perc' in config['dataset']['transforms']['panoptic'].keys() else 0,
+                                            ) )
           infer_ts.append( Mytrans.Panoptic( radius=config['dataset']['transforms']['panoptic']['radius'],
                                              blur=config['dataset']['transforms']['panoptic']['blur'],
                                              noiserange=None,
